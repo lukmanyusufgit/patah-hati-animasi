@@ -220,20 +220,20 @@
     .character {
       position: absolute;
       z-index: 2;
-      bottom: 16%;
+      bottom: 8%;
       left: 50%;
-      width: 132px;
-      height: 238px;
-      transform: translateX(-50%) translateY(var(--lift, 0px)) rotate(var(--sway, 0deg));
-      transition: left .05s linear, bottom 1s, transform .18s ease-out;
-      animation: float var(--float-speed, 3s) ease-in-out infinite;
+      width: 170px;
+      height: 285px;
+      transform: translateX(-50%);
+      transition: left .05s linear;
     }
-    .character.walking { animation: none; }
-    .stage.walking .arm { animation: armSwing .62s ease-in-out infinite alternate; }
-    .stage.walking .arm.right { animation-direction: alternate-reverse; }
-    .stage.walking .legs i { animation: legSwing .62s ease-in-out infinite alternate; }
-    .stage.walking .legs i:last-child { animation-direction: alternate-reverse; }
-    .stage.walking .body { transform-origin: 50% 100%; animation: bodyWalk .62s ease-in-out infinite; }
+    .anime-ninja { display: block; width: 100%; height: 100%; overflow: visible; }
+    .stage.walking .anime-leg { animation: ninjaStep .52s ease-in-out infinite alternate; transform-box: view-box; }
+    .stage.walking .leg-back { animation-direction: alternate-reverse; }
+    .stage.walking .anime-arm { animation: ninjaArm .52s ease-in-out infinite alternate; transform-box: view-box; }
+    .stage.walking .arm-back { animation-direction: alternate-reverse; }
+    .stage.walking .ninja-torso { animation: ninjaBreathe .52s ease-in-out infinite alternate; transform-origin: 100px 185px; }
+    .stage.walking .scarf-tail { animation: scarfFlow 1.1s ease-in-out infinite alternate; transform-box: view-box; transform-origin: 135px 103px; }
     .portrait {
       position: absolute;
       z-index: 4;
@@ -248,161 +248,10 @@
     }
     .stage.has-portrait .portrait { display: block; }
     .stage.has-portrait .character > :not(.portrait) { display: none; }
-    .head {
-      position: absolute;
-      top: 0;
-      left: 26px;
-      width: 80px;
-      height: 82px;
-      border: 4px solid #252337;
-      border-radius: 46% 48% 43% 45%;
-      background: #f4bd99;
-      box-shadow: inset -9px -4px #d9987f;
-    }
-    .hair {
-      position: absolute;
-      z-index: 1;
-      top: -5px;
-      left: 23px;
-      width: 85px;
-      height: 47px;
-      border-radius: 55% 50% 25% 25%;
-      background: #272337;
-      transform: rotate(-7deg);
-    }
-    .hair::after {
-      position: absolute;
-      top: 18px;
-      left: 4px;
-      width: 29px;
-      height: 30px;
-      border-radius: 4px 0 18px 0;
-      background: #272337;
-      content: "";
-    }
-    .eye {
-      position: absolute;
-      z-index: 2;
-      top: 39px;
-      left: 47px;
-      width: 7px;
-      height: 5px;
-      border-radius: 50%;
-      background: #30283b;
-      box-shadow: 28px 0 #30283b;
-    }
-    .tear {
-      position: absolute;
-      z-index: 2;
-      top: 47px;
-      left: 49px;
-      width: 5px;
-      height: 13px;
-      border-radius: 70% 30% 60% 60%;
-      background: #a9d9ff;
-      box-shadow: 28px 0 #a9d9ff;
-      opacity: .9;
-      animation: tear 2s ease-in infinite;
-    }
-    .mouth {
-      position: absolute;
-      z-index: 2;
-      top: 59px;
-      left: 58px;
-      width: 16px;
-      height: 8px;
-      border-top: 3px solid #9e565f;
-      border-radius: 50%;
-    }
-    .body {
-      position: absolute;
-      top: 76px;
-      left: 17px;
-      width: 98px;
-      height: 124px;
-      border: 4px solid #252337;
-      border-radius: 36px 36px 20px 20px;
-      background: linear-gradient(115deg, #f17f91, #bd5277);
-      box-shadow: inset -12px 0 #9e466a;
-    }
-    .body::after {
-      position: absolute;
-      top: 104px;
-      left: 12px;
-      width: 63px;
-      height: 23px;
-      border: 4px solid #252337;
-      border-top: 0;
-      border-radius: 0 0 15px 15px;
-      background: #f4bd99;
-      content: "";
-    }
-    .arm {
-      position: absolute;
-      z-index: -1;
-      top: 91px;
-      left: 2px;
-      width: 27px;
-      height: 92px;
-      border: 4px solid #252337;
-      border-radius: 20px;
-      background: #f4bd99;
-      transform: rotate(calc(12deg + var(--sway, 0deg)));
-      transition: transform .18s ease-out;
-    }
-    .arm.right { left: 103px; transform: rotate(calc(-12deg + var(--sway, 0deg))); }
-    .legs {
-      position: absolute;
-      top: 188px;
-      left: 32px;
-      width: 70px;
-      height: 48px;
-    }
-    .legs i {
-      position: absolute;
-      top: 0;
-      left: 6px;
-      width: 13px;
-      height: 46px;
-      border-radius: 0 0 7px 7px;
-      background: #252337;
-      transform-origin: 50% 5%;
-    }
-    .legs i:last-child { left: 39px; }
-    .legs i::after {
-      position: absolute;
-      right: -7px;
-      bottom: 0;
-      width: 23px;
-      height: 9px;
-      border-radius: 50% 70% 20% 30%;
-      background: #252337;
-      content: "";
-    }
-    .heart {
-      position: absolute;
-      z-index: 1;
-      top: 97px;
-      left: 57px;
-      color: #ffd2df;
-      font-size: 28px;
-      text-shadow: 0 2px #9e466a;
-      animation: heartbeat 1.4s ease-in-out infinite;
-    }
-
-    .stage.sunrise .character, .stage.healing .character {
-      left: 60%;
-      bottom: 17%;
-      transform: translateX(-50%) translateY(var(--lift, 0px)) rotate(calc(3deg + var(--sway, 0deg)));
-    }
-    .stage.sunrise .tear, .stage.healing .tear { opacity: 0; }
-    .stage.sunrise .mouth, .stage.healing .mouth {
-      top: 56px;
-      height: 12px;
-      border: 0;
-      border-bottom: 3px solid #9e565f;
-    }
-    .stage.healing .heart { color: #fff1a9; }
+    .ninja-tear { animation: tear 1.8s ease-in infinite; }
+    .ninja-smile { opacity: 0; transition: opacity .5s; }
+    .stage.sunrise .ninja-tear, .stage.healing .ninja-tear { opacity: 0; }
+    .stage.sunrise .ninja-smile, .stage.healing .ninja-smile { opacity: 1; }
 
     .butterflies {
       position: absolute;
@@ -532,21 +381,19 @@
     .fine-print { margin: 14px 0 0; color: #aaa6b8; font-size: .76rem; line-height: 1.5; }
 
     @keyframes rain { to { background-position: 0 48px; } }
-    @keyframes float { 0%, 100% { margin-bottom: 0; } 50% { margin-bottom: 7px; } }
-    @keyframes armSwing { from { transform: rotate(-13deg); } to { transform: rotate(13deg); } }
-    @keyframes legSwing { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
-    @keyframes bodyWalk { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    @keyframes ninjaStep { from { transform: rotate(-19deg); } to { transform: rotate(19deg); } }
+    @keyframes ninjaArm { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
+    @keyframes ninjaBreathe { from { transform: translateY(0); } to { transform: translateY(-2px); } }
+    @keyframes scarfFlow { from { transform: rotate(-4deg); } to { transform: rotate(8deg); } }
     @keyframes captionEnter { from { opacity: 0; translate: 22px 0; } to { opacity: 1; translate: 0 0; } }
     @keyframes tear { 0% { transform: translateY(0); opacity: 0; } 18% { opacity: 1; } 100% { transform: translateY(23px); opacity: 0; } }
-    @keyframes heartbeat { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.18); } 23% { transform: scale(1); } 36% { transform: scale(1.12); } }
     @keyframes flutter { 0%, 100% { transform: translate(0, 0) rotate(-8deg); } 50% { transform: translate(22px, -13px) rotate(10deg); } }
 
     @media (max-width: 700px) {
       .app { padding: 20px 15px 32px; }
       .stage { min-height: 520px; }
       .caption { top: 22px; left: 20px; max-width: 72%; }
-      .character { bottom: 13%; transform: translateX(-50%) scale(.88); transform-origin: bottom center; }
-      .stage.sunrise .character, .stage.healing .character { bottom: 14%; transform: translateX(-50%) translateY(var(--lift, 0px)) rotate(calc(3deg + var(--sway, 0deg))) scale(.88); }
+      .character { bottom: 8%; width: 146px; height: 246px; }
       .controls { grid-template-columns: 1fr; }
       .button-row { justify-content: space-between; }
       .progress-wrap { grid-row: 1; }
@@ -558,8 +405,8 @@
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-      .stage.walking .arm, .stage.walking .legs i, .stage.walking .body {
-        animation-duration: .62s !important;
+      .stage.walking .anime-leg, .stage.walking .anime-arm, .stage.walking .ninja-torso {
+        animation-duration: .52s !important;
         animation-iteration-count: infinite !important;
       }
     }
@@ -595,10 +442,57 @@
       <div class="puddle" aria-hidden="true"></div>
       <div class="music-glow" aria-hidden="true"></div>
       <div class="butterflies" aria-hidden="true">✦</div>
-      <div class="character" aria-label="Tokoh kartun yang sedang belajar pulih">
+      <div class="character" aria-label="Ninja pengembara bergaya anime, karakter orisinal">
+        <svg class="anime-ninja" viewBox="0 0 200 320" role="img" aria-label="Ilustrasi ninja muda dengan rambut biru gelap, syal krem, dan pakaian teal">
+          <ellipse cx="101" cy="302" rx="47" ry="8" fill="#111426" opacity=".35"/>
+          <g class="anime-leg leg-back">
+            <path d="M103 210 137 211 143 267 129 287 107 282 116 264Z" fill="#24364c" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+            <path d="m116 270 24 7 13 18-5 8-43-3-3-8Z" fill="#d8ded9" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+            <path d="m110 290 41 3-3 8-43-1Z" fill="#e5a85d"/>
+          </g>
+          <g class="anime-leg leg-front">
+            <path d="M67 207 105 210 94 263 79 283 57 276 72 253Z" fill="#314761" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+            <path d="m63 266 25 8 7 18-5 10-43-4-3-9Z" fill="#e4e8df" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+            <path d="m49 294 45 3-3 8-43-1Z" fill="#e5a85d"/>
+          </g>
+          <path d="M65 129 132 127 151 202 135 229 64 224 48 202Z" fill="#183f4d" stroke="#172235" stroke-width="6" stroke-linejoin="round"/>
+          <path d="m76 142 25 15 24-17 13 54-37 23-40-23Z" fill="#287482"/>
+          <path d="m75 149 26 11-19 43-17-13Z" fill="#d8ded9"/>
+          <path d="m126 149-25 11 20 43 18-13Z" fill="#e8ece2"/>
+          <path d="m56 193 88 3 4 18-94-3Z" fill="#263249" stroke="#172235" stroke-width="4"/>
+          <path d="m96 193 13 1-1 19-14-1Z" fill="#e5a85d" stroke="#172235" stroke-width="3"/>
+          <path d="m128 201 13 2 3 24-16-1Z" fill="#355361" stroke="#172235" stroke-width="4"/>
+          <g class="anime-arm arm-back">
+            <path d="M137 148q18 3 22 19l11 31q3 11-7 15-9 3-14-7l-17-31Z" fill="#287482" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+            <path d="m158 199 12-5 9 13q5 10-4 14-8 4-13-5Z" fill="#f1c5a3" stroke="#172235" stroke-width="4"/>
+          </g>
+          <g class="anime-arm arm-front">
+            <path d="M61 147q-17 4-21 19l-10 31q-4 11 6 15 9 3 14-7l17-31Z" fill="#326f78" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+            <path d="m31 197-12-4-8 14q-5 10 4 14 8 4 13-5Z" fill="#f1c5a3" stroke="#172235" stroke-width="4"/>
+          </g>
+          <g class="ninja-torso">
+            <path d="M69 123q31-19 62 1l10 30q-39 19-82 0Z" fill="#e8ece2" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M75 135q24 9 49 0l-5 14q-21 8-40 0Z" fill="#ddb86e"/>
+            <path d="M78 124q22 16 43 0l-3 25q-18 11-37 0Z" fill="#263d50" stroke="#172235" stroke-width="4"/>
+            <path d="m98 137 7 0 3 8-7 6-7-6Z" fill="#e5a85d"/>
+          </g>
+          <path class="scarf-tail" d="M120 105q29 6 44-9l-8 24q-13 10-30 3l-16 15 2-21Z" fill="#e5b96d" stroke="#172235" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M65 74q3-32 37-34 35 1 38 34l-7 39q-11 25-32 26-23-2-33-27Z" fill="#f1c5a3" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M66 89q-13-26 4-48l20-18 6 16 18-21 3 20 18-9 15 26-11 35-10-27-16 5-13-16-12 19-17 4Z" fill="#263249" stroke="#172235" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M83 81q8-6 16 0" fill="none" stroke="#263249" stroke-width="4" stroke-linecap="round"/>
+          <path d="M111 80q8-6 16 0" fill="none" stroke="#263249" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="94" cy="91" rx="4" ry="3" fill="#263249"/>
+          <ellipse cx="119" cy="91" rx="4" ry="3" fill="#263249"/>
+          <path d="M104 91 101 102l7 2" fill="none" stroke="#c38373" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M94 114q9-7 18 0" fill="none" stroke="#9b5c61" stroke-width="3" stroke-linecap="round"/>
+          <path class="ninja-smile" d="M94 110q9 13 19 0" fill="none" stroke="#9b5c61" stroke-width="3" stroke-linecap="round"/>
+          <path class="ninja-tear" d="M88 97q-8 13 0 19 8-6 0-19Z" fill="#9edaff"/>
+          <path d="M68 108q-11 4-9 15 3 9 14 7" fill="#f1c5a3" stroke="#172235" stroke-width="4"/>
+          <path d="M134 106q11 4 9 15-3 9-14 7" fill="#f1c5a3" stroke="#172235" stroke-width="4"/>
+          <path d="M68 119q32 15 66 0l-6 15q-26 14-53 0Z" fill="#e5b96d" stroke="#172235" stroke-width="4" stroke-linejoin="round"/>
+          <path d="m93 132 9 4 8-4-3 14-6 6-7-7Z" fill="#f1c5a3" stroke="#172235" stroke-width="3"/>
+        </svg>
         <img class="portrait" id="portrait" alt="Foto anime pilihan Anda">
-        <div class="hair"></div><div class="head"></div><div class="eye"></div><div class="tear"></div><div class="mouth"></div>
-        <div class="arm"></div><div class="arm right"></div><div class="body"></div><div class="heart">♥</div><div class="legs"><i></i><i></i></div>
       </div>
       <div class="caption" aria-live="polite">
         <div class="scene-number" id="sceneNumber">Adegan 1 dari 5</div>
@@ -632,7 +526,7 @@
           <audio id="audioPlayer" controls hidden></audio>
         </div>
         <div class="upload-divider"></div>
-        <p class="upload-heading">🖼️ Ganti karakter dengan foto anime</p>
+        <p class="upload-heading">🖼️ Ganti ninja dengan foto anime pilihan Anda</p>
         <div class="audio-actions">
           <label class="file-label">Pilih foto
             <input type="file" id="portraitFile" accept="image/*">
@@ -640,7 +534,7 @@
           <button type="button" id="clearPortrait" hidden>Hapus foto</button>
           <span class="upload-status" id="portraitStatus" role="status">Belum ada foto dipilih.</span>
         </div>
-        <p class="audio-note" style="margin-top:8px">Pilih JPG, PNG, atau WebP. Foto hanya digunakan di halaman ini dan tidak diunggah.</p>
+        <p class="audio-note" style="margin-top:8px">Ilustrasi ninja anime di panggung adalah karakter orisinal. Pilih JPG, PNG, atau WebP milik Anda untuk menggantinya; foto hanya digunakan di halaman ini dan tidak diunggah.</p>
       </div>
       <div class="card">
         <h3>💌 Pesan cerita</h3>
