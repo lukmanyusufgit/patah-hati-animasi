@@ -533,8 +533,15 @@
         animation-duration: .52s !important;
         animation-iteration-count: infinite !important;
       }
-      .weather-rain i, .weather-clouds span, .weather-wind i, .weather-petals i,
-      .weather-sunbeam, .weather-flash { animation-duration: 12s !important; }
+      .stage.rain::before { animation-duration: .45s !important; animation-iteration-count: infinite !important; }
+      .weather-clouds span { animation-duration: 34s !important; animation-iteration-count: infinite !important; }
+      .weather-clouds span:nth-child(2) { animation-duration: 47s !important; animation-iteration-count: infinite !important; }
+      .weather-clouds span:nth-child(3) { animation-duration: 56s !important; animation-iteration-count: infinite !important; }
+      .weather-rain i { animation-duration: .72s !important; animation-iteration-count: infinite !important; }
+      .weather-wind i { animation-duration: 5s !important; animation-iteration-count: infinite !important; }
+      .weather-petals i { animation-duration: 7s !important; animation-iteration-count: infinite !important; }
+      .weather-sunbeam { animation-duration: 8s !important; animation-iteration-count: infinite !important; }
+      .weather-flash { animation-duration: 9s !important; animation-iteration-count: infinite !important; }
     }
 
     @media print {
