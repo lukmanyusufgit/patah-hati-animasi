@@ -110,7 +110,7 @@
     .stage.rain::before { opacity: .45; animation: rain var(--rain-speed, .45s) linear infinite; }
     .weather-layer {
       position: absolute;
-      z-index: 1;
+      z-index: 5;
       inset: 0;
       overflow: hidden;
       pointer-events: none;
@@ -171,7 +171,6 @@
       animation: raindrop var(--rain-speed, .72s) linear var(--drop-delay, 0s) infinite;
     }
     .weather-flash {
-      z-index: 1;
       background: #e9eaff;
       opacity: 0;
     }
@@ -206,7 +205,6 @@
     }
 
     .weather-sunbeam {
-      z-index: 0;
       opacity: 0;
       background: linear-gradient(112deg, transparent 22%, #fff3c11b 35%, transparent 52%, #fff0bb12 68%, transparent 81%);
       background-size: 200% 100%;
@@ -377,7 +375,7 @@
 
     .caption {
       position: absolute;
-      z-index: 3;
+      z-index: 6;
       top: 28px;
       left: 32px;
       max-width: min(52%, 500px);
