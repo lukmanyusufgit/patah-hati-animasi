@@ -114,7 +114,9 @@
       inset: 0;
       overflow: hidden;
       pointer-events: none;
+      transition: filter .18s ease;
     }
+    .stage.audio-beat .weather-layer { filter: brightness(1.22); }
     .weather-clouds { opacity: .42; transition: opacity 1.2s; }
     .weather-clouds span {
       position: absolute;
@@ -126,7 +128,7 @@
       background: #d7d6ed;
       filter: blur(1px);
       opacity: .48;
-      animation: cloudDrift 34s linear infinite;
+      animation: cloudDrift var(--cloud-speed, 34s) linear infinite;
     }
     .weather-clouds span::before, .weather-clouds span::after {
       position: absolute;
@@ -141,14 +143,14 @@
       top: 32%;
       width: 102px;
       opacity: .32;
-      animation-duration: 47s;
+      animation-duration: var(--cloud-speed-2, 47s);
       animation-delay: -19s;
     }
     .weather-clouds span:nth-child(3) {
       top: 13%;
       width: 158px;
       opacity: .24;
-      animation-duration: 56s;
+      animation-duration: var(--cloud-speed-3, 56s);
       animation-delay: -36s;
     }
     .stage.night .weather-clouds { opacity: .58; }
@@ -175,6 +177,7 @@
       opacity: 0;
     }
     .stage.rain .weather-flash { animation: distantLightning 9s ease-out infinite; }
+    .stage.rain.audio-beat .weather-flash { animation: beatLightning .32s ease-out; }
 
     .weather-wind { opacity: 0; transition: opacity .9s; }
     .stage.dawn .weather-wind, .stage.healing .weather-wind { opacity: 1; }
@@ -187,7 +190,7 @@
       border-radius: 100% 0 100% 0;
       background: var(--leaf-color, #e6bd88);
       opacity: .82;
-      animation: leafDrift var(--leaf-speed, 5s) linear var(--leaf-delay, 0s) infinite;
+      animation: leafDrift var(--audio-wind-speed, var(--leaf-speed, 5s)) linear var(--leaf-delay, 0s) infinite;
     }
 
     .weather-petals { opacity: 0; transition: opacity 1.2s; }
@@ -201,7 +204,7 @@
       border-radius: 90% 10% 80% 20%;
       background: var(--petal-color, #ffe3e8);
       opacity: .88;
-      animation: petalFall var(--petal-speed, 7s) linear var(--petal-delay, 0s) infinite;
+      animation: petalFall var(--audio-petal-speed, var(--petal-speed, 7s)) linear var(--petal-delay, 0s) infinite;
     }
 
     .weather-sunbeam {
@@ -500,6 +503,7 @@
       100% { transform: translate3d(-22px, 570px, 0) rotate(480deg); }
     }
     @keyframes distantLightning { 0%, 91%, 94%, 100% { opacity: 0; } 92% { opacity: .12; } 93% { opacity: .025; } }
+    @keyframes beatLightning { 0%, 100% { opacity: 0; } 28% { opacity: .18; } 62% { opacity: .04; } }
     @keyframes sunSweep { from { background-position: 0 0; } to { background-position: 100% 0; } }
     @keyframes ninjaStep { from { transform: rotate(-19deg); } to { transform: rotate(19deg); } }
     @keyframes ninjaArm { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
@@ -735,6 +739,8 @@
     let animationFrame = null;
     let smoothedEnergy = 0;
     let lastBeat = 0;
+    let lastWeatherBeatAt = 0;
+    let weatherBeatTimeout = null;
     let sceneChangeTimeout = null;
 
     function showScene(index) {
@@ -795,6 +801,14 @@
       stage.style.setProperty("--rain-speed", ".45s");
       stage.style.setProperty("--ripple", "1");
       stage.style.setProperty("--scenery-drift", "0px");
+      for (const property of ["--cloud-speed", "--cloud-speed-2", "--cloud-speed-3", "--audio-wind-speed", "--audio-petal-speed"]) {
+        stage.style.removeProperty(property);
+      }
+      if (weatherBeatTimeout !== null) {
+        window.clearTimeout(weatherBeatTimeout);
+        weatherBeatTimeout = null;
+      }
+      stage.classList.remove("audio-beat");
     }
 
     function animateToAudio() {
@@ -815,6 +829,7 @@
         smoothedEnergy += (energy - smoothedEnergy) * 0.16;
       } else {
         smoothedEnergy = .12 + (Math.sin(audioPlayer.currentTime * 9) + 1) * .08;
+        bass = (Math.sin(audioPlayer.currentTime * 9) + 1) * .35;
       }
       const beat = Math.max(0, bass - lastBeat * 0.82);
       lastBeat = bass;
@@ -824,8 +839,25 @@
       stage.style.setProperty("--audio-level", motion.toFixed(2));
       stage.style.setProperty("--flutter-speed", `${(1.7 - motion * 0.65).toFixed(2)}s`);
       stage.style.setProperty("--rain-speed", `${(0.56 - motion * 0.12).toFixed(2)}s`);
+      stage.style.setProperty("--cloud-speed", `${(36 - motion * 12).toFixed(1)}s`);
+      stage.style.setProperty("--cloud-speed-2", `${(49 - motion * 16).toFixed(1)}s`);
+      stage.style.setProperty("--cloud-speed-3", `${(58 - motion * 19).toFixed(1)}s`);
+      stage.style.setProperty("--audio-wind-speed", `${(7.5 - motion * 2.2).toFixed(2)}s`);
+      stage.style.setProperty("--audio-petal-speed", `${(9 - motion * 2.5).toFixed(2)}s`);
       stage.style.setProperty("--ripple", (1 + motion * 0.1).toFixed(2));
       stage.style.setProperty("--scenery-drift", `${((bass - 0.28) * 5).toFixed(1)}px`);
+      const now = performance.now();
+      if (bass > 0.24 && beat > 0.12 && now - lastWeatherBeatAt > 180) {
+        lastWeatherBeatAt = now;
+        stage.classList.remove("audio-beat");
+        stage.offsetWidth;
+        stage.classList.add("audio-beat");
+        if (weatherBeatTimeout !== null) window.clearTimeout(weatherBeatTimeout);
+        weatherBeatTimeout = window.setTimeout(() => {
+          stage.classList.remove("audio-beat");
+          weatherBeatTimeout = null;
+        }, 160);
+      }
       if (Number.isFinite(audioPlayer.duration) && audioPlayer.duration > 0) {
         const songProgress = Math.min(1, Math.max(0, audioPlayer.currentTime / audioPlayer.duration));
         const walkCycle = (audioPlayer.currentTime % 32) / 32;
