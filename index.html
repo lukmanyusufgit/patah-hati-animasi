@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111228">
+  <title>Patah Hati, Lalu Pulih — Animasi Kartun</title>
+  <style>
+    @property --sky1 { syntax: "<color>"; inherits: true; initial-value: #20223f; }
+    @property --sky2 { syntax: "<color>"; inherits: true; initial-value: #46436a; }
+    @property --ground { syntax: "<color>"; inherits: true; initial-value: #272943; }
+    @property --glow { syntax: "<color>"; inherits: true; initial-value: #b8a4ff; }
+
+    :root {
+      color-scheme: dark;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #10111f;
+      color: #fff;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --pink: #ff78a8;
+      --muted: #c9c6d7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 50% -20%, #353252 0, transparent 55%),
+        #10111f;
+    }
+
+    button, input { font: inherit; }
+
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 28px 24px 42px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      color: #d5d1e3;
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .badge {
+      border: 1px solid #ffffff24;
+      border-radius: 999px;
+      padding: 7px 12px;
+      color: #e3ddec;
+      font-size: .76rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 5vw, 3.3rem);
+      letter-spacing: -.045em;
+      line-height: 1.05;
+    }
+
+    .intro {
+      max-width: 680px;
+      margin: 10px 0 22px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .stage {
+      --sky1: #20223f;
+      --sky2: #46436a;
+      --ground: #272943;
+      --glow: #b8a4ff;
+      --audio-level: 0;
+      position: relative;
+      min-height: 480px;
+      overflow: hidden;
+      isolation: isolate;
+      border: 1px solid #ffffff20;
+      border-radius: 25px;
+      background: linear-gradient(180deg, var(--sky1), var(--sky2) 76%, var(--ground) 76%);
+      box-shadow: 0 28px 90px #0007, inset 0 1px #ffffff16;
+      transition: --sky1 1.1s ease, --sky2 1.1s ease, --ground 1.1s ease, --glow 1.1s ease;
+    }
+
+    .stage::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      content: "";
+      opacity: 0;
+      background: repeating-linear-gradient(105deg, transparent 0 23px, #d7e6ff72 24px 26px, transparent 27px 48px);
+      transform: translateY(-15%);
+      transition: opacity .8s;
+    }
+
+    .stage.rain::before { opacity: .45; animation: rain var(--rain-speed, .45s) linear infinite; }
+    .stage.sunrise {
+      --sky1: #ef8e9a;
+      --sky2: #f9c18e;
+      --ground: #617c79;
+      --glow: #ffe29d;
+    }
+    .stage.healing {
+      --sky1: #f198aa;
+      --sky2: #ffd29a;
+      --ground: #638f86;
+      --glow: #fff0b5;
+    }
+    .stage.night { --sky1: #171b39; --sky2: #353968; --ground: #202744; --glow: #c8baff; }
+    .stage.dawn { --sky1: #353b70; --sky2: #ef9c9d; --ground: #4a656e; --glow: #ffe6ab; }
+    .stage.scene-change .caption {
+      animation: captionEnter .75s cubic-bezier(.2,.75,.25,1) both;
+    }
+
+    .stars {
+      position: absolute;
+      inset: 0 0 24%;
+      opacity: .8;
+      background-image:
+        radial-gradient(2px 2px at 12% 18%, #fff 99%, transparent),
+        radial-gradient(2px 2px at 77% 20%, #fff 99%, transparent),
+        radial-gradient(1px 1px at 86% 46%, #fff 99%, transparent),
+        radial-gradient(2px 2px at 29% 38%, #fff 99%, transparent),
+        radial-gradient(1px 1px at 64% 11%, #fff 99%, transparent);
+      transition: opacity 1s;
+    }
+    .stage.sunrise .stars, .stage.healing .stars { opacity: .13; }
+
+    .moon {
+      position: absolute;
+      top: 12%;
+      right: 15%;
+      width: 66px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--glow);
+      box-shadow: 0 0 65px 18px color-mix(in srgb, var(--glow), transparent 45%);
+      transition: all 1s;
+    }
+    .stage.sunrise .moon, .stage.healing .moon {
+      top: 31%;
+      right: 17%;
+      width: 92px;
+      background: #ffe8a1;
+      box-shadow: 0 0 80px 25px #ffcc8a80;
+    }
+
+    .hills {
+      position: absolute;
+      right: -6%;
+      bottom: 22%;
+      left: -6%;
+      height: 26%;
+      border-radius: 50% 50% 0 0 / 45% 45% 0 0;
+      background: #44466b;
+      opacity: .72;
+      transform: translateX(var(--scenery-drift, 0px));
+      transition: background 1s, transform .22s ease-out;
+    }
+    .hills::after {
+      position: absolute;
+      top: 21%;
+      left: 48%;
+      width: 80%;
+      height: 100%;
+      border-radius: 50% 50% 0 0 / 45% 45% 0 0;
+      background: #555878;
+      content: "";
+    }
+    .stage.sunrise .hills, .stage.healing .hills { background: #69877e; }
+    .stage.sunrise .hills::after, .stage.healing .hills::after { background: #7c9981; }
+
+    .ground {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 24%;
+      background: linear-gradient(180deg, transparent, #10152255), var(--ground);
+    }
+
+    .music-glow {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      pointer-events: none;
+      opacity: var(--audio-level);
+      background: radial-gradient(ellipse at 50% 72%, #ffe0a766, transparent 42%);
+      transition: opacity .12s;
+    }
+
+    .puddle {
+      position: absolute;
+      bottom: 13%;
+      left: 50%;
+      width: min(48%, 340px);
+      height: 28px;
+      border: 1px solid #e2dfff3b;
+      border-radius: 50%;
+      background: #a9bdff20;
+      transform: translateX(-50%) scale(var(--ripple, 1));
+      transition: opacity .8s, background 1s, transform .14s ease-out;
+    }
+    .stage.sunrise .puddle, .stage.healing .puddle { background: #fff1be4a; }
+
+    .character {
+      position: absolute;
+      z-index: 2;
+      bottom: 16%;
+      left: 50%;
+      width: 132px;
+      height: 238px;
+      transform: translateX(-50%) translateY(var(--lift, 0px)) rotate(var(--sway, 0deg));
+      transition: left .05s linear, bottom 1s, transform .18s ease-out;
+      animation: float var(--float-speed, 3s) ease-in-out infinite;
+    }
+    .character.walking { animation: none; }
+    .stage.walking .arm { animation: armSwing .62s ease-in-out infinite alternate; }
+    .stage.walking .arm.right { animation-direction: alternate-reverse; }
+    .stage.walking .legs i { animation: legSwing .62s ease-in-out infinite alternate; }
+    .stage.walking .legs i:last-child { animation-direction: alternate-reverse; }
+    .stage.walking .body { transform-origin: 50% 100%; animation: bodyWalk .62s ease-in-out infinite; }
+    .portrait {
+      position: absolute;
+      z-index: 4;
+      inset: 0;
+      display: none;
+      width: 100%;
+      height: 100%;
+      border: 4px solid #28243a;
+      border-radius: 48% 48% 20% 20%;
+      object-fit: cover;
+      box-shadow: 0 12px 32px #090a18a0;
+    }
+    .stage.has-portrait .portrait { display: block; }
+    .stage.has-portrait .character > :not(.portrait) { display: none; }
+    .head {
+      position: absolute;
+      top: 0;
+      left: 26px;
+      width: 80px;
+      height: 82px;
+      border: 4px solid #252337;
+      border-radius: 46% 48% 43% 45%;
+      background: #f4bd99;
+      box-shadow: inset -9px -4px #d9987f;
+    }
+    .hair {
+      position: absolute;
+      z-index: 1;
+      top: -5px;
+      left: 23px;
+      width: 85px;
+      height: 47px;
+      border-radius: 55% 50% 25% 25%;
+      background: #272337;
+      transform: rotate(-7deg);
+    }
+    .hair::after {
+      position: absolute;
+      top: 18px;
+      left: 4px;
+      width: 29px;
+      height: 30px;
+      border-radius: 4px 0 18px 0;
+      background: #272337;
+      content: "";
+    }
+    .eye {
+      position: absolute;
+      z-index: 2;
+      top: 39px;
+      left: 47px;
+      width: 7px;
+      height: 5px;
+      border-radius: 50%;
+      background: #30283b;
+      box-shadow: 28px 0 #30283b;
+    }
+    .tear {
+      position: absolute;
+      z-index: 2;
+      top: 47px;
+      left: 49px;
+      width: 5px;
+      height: 13px;
+      border-radius: 70% 30% 60% 60%;
+      background: #a9d9ff;
+      box-shadow: 28px 0 #a9d9ff;
+      opacity: .9;
+      animation: tear 2s ease-in infinite;
+    }
+    .mouth {
+      position: absolute;
+      z-index: 2;
+      top: 59px;
+      left: 58px;
+      width: 16px;
+      height: 8px;
+      border-top: 3px solid #9e565f;
+      border-radius: 50%;
+    }
+    .body {
+      position: absolute;
+      top: 76px;
+      left: 17px;
+      width: 98px;
+      height: 124px;
+      border: 4px solid #252337;
+      border-radius: 36px 36px 20px 20px;
+      background: linear-gradient(115deg, #f17f91, #bd5277);
+      box-shadow: inset -12px 0 #9e466a;
+    }
+    .body::after {
+      position: absolute;
+      top: 104px;
+      left: 12px;
+      width: 63px;
+      height: 23px;
+      border: 4px solid #252337;
+      border-top: 0;
+      border-radius: 0 0 15px 15px;
+      background: #f4bd99;
+      content: "";
+    }
+    .arm {
+      position: absolute;
+      z-index: -1;
+      top: 91px;
+      left: 2px;
+      width: 27px;
+      height: 92px;
+      border: 4px solid #252337;
+      border-radius: 20px;
+      background: #f4bd99;
+      transform: rotate(calc(12deg + var(--sway, 0deg)));
+      transition: transform .18s ease-out;
+    }
+    .arm.right { left: 103px; transform: rotate(calc(-12deg + var(--sway, 0deg))); }
+    .legs {
+      position: absolute;
+      top: 188px;
+      left: 32px;
+      width: 70px;
+      height: 48px;
+    }
+    .legs i {
+      position: absolute;
+      top: 0;
+      left: 6px;
+      width: 13px;
+      height: 46px;
+      border-radius: 0 0 7px 7px;
+      background: #252337;
+      transform-origin: 50% 5%;
+    }
+    .legs i:last-child { left: 39px; }
+    .legs i::after {
+      position: absolute;
+      right: -7px;
+      bottom: 0;
+      width: 23px;
+      height: 9px;
+      border-radius: 50% 70% 20% 30%;
+      background: #252337;
+      content: "";
+    }
+    .heart {
+      position: absolute;
+      z-index: 1;
+      top: 97px;
+      left: 57px;
+      color: #ffd2df;
+      font-size: 28px;
+      text-shadow: 0 2px #9e466a;
+      animation: heartbeat 1.4s ease-in-out infinite;
+    }
+
+    .stage.sunrise .character, .stage.healing .character {
+      left: 60%;
+      bottom: 17%;
+      transform: translateX(-50%) translateY(var(--lift, 0px)) rotate(calc(3deg + var(--sway, 0deg)));
+    }
+    .stage.sunrise .tear, .stage.healing .tear { opacity: 0; }
+    .stage.sunrise .mouth, .stage.healing .mouth {
+      top: 56px;
+      height: 12px;
+      border: 0;
+      border-bottom: 3px solid #9e565f;
+    }
+    .stage.healing .heart { color: #fff1a9; }
+
+    .butterflies {
+      position: absolute;
+      z-index: 2;
+      top: 32%;
+      left: 27%;
+      opacity: 0;
+      color: #fff1c7;
+      font-size: 38px;
+      transition: opacity 1s;
+      animation: flutter 2s ease-in-out infinite;
+      animation-duration: var(--flutter-speed, 2s);
+    }
+    .stage.healing .butterflies { opacity: 1; }
+
+    .caption {
+      position: absolute;
+      z-index: 3;
+      top: 28px;
+      left: 32px;
+      max-width: min(52%, 500px);
+      text-shadow: 0 2px 16px #0008;
+    }
+    .scene-number {
+      color: #ffe3a8;
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .caption h2 {
+      margin: 9px 0 7px;
+      font-size: clamp(1.45rem, 3.5vw, 2.25rem);
+      letter-spacing: -.035em;
+    }
+    .caption p {
+      margin: 0;
+      color: #f1ebf5;
+      font-size: clamp(.88rem, 1.6vw, 1rem);
+      line-height: 1.55;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 17px 4px 0;
+    }
+    .button-row { display: flex; gap: 9px; }
+    button, .file-label {
+      min-height: 42px;
+      border: 1px solid #ffffff2b;
+      border-radius: 12px;
+      padding: 9px 14px;
+      color: #fff;
+      background: #ffffff0d;
+      cursor: pointer;
+      transition: background .2s, transform .2s, border-color .2s;
+    }
+    button:hover, .file-label:hover { border-color: #ff91b7a8; background: #ff78a81b; }
+    button:active, .file-label:active { transform: scale(.97); }
+    button:focus-visible, .file-label:focus-within, input:focus-visible {
+      outline: 3px solid #ff9dbe;
+      outline-offset: 3px;
+    }
+    .primary {
+      border-color: transparent;
+      color: #261a2c;
+      background: linear-gradient(120deg, #ff9fbe, #ffd09d);
+      font-weight: 800;
+    }
+    .progress-wrap { display: flex; align-items: center; gap: 12px; color: #c9c6d7; font-size: .82rem; }
+    progress { width: 100%; height: 7px; appearance: none; }
+    progress::-webkit-progress-bar { border-radius: 9px; background: #ffffff1b; }
+    progress::-webkit-progress-value { border-radius: 9px; background: linear-gradient(90deg, #ff78a8, #ffd09d); }
+    progress::-moz-progress-bar { border-radius: 9px; background: linear-gradient(90deg, #ff78a8, #ffd09d); }
+
+    .extras {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .card {
+      border: 1px solid #ffffff1a;
+      border-radius: 17px;
+      padding: 17px;
+      background: #ffffff08;
+    }
+    .card h3 { margin: 0 0 7px; font-size: 1rem; }
+    .card p, .audio-note { margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+    .audio-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+    .file-label { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; }
+    .file-label input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    audio { width: min(100%, 330px); height: 38px; }
+    #audioStatus { color: #e6dfea; font-size: .8rem; }
+    .upload-divider { height: 1px; margin: 14px 0; background: #ffffff1a; }
+    .upload-heading { margin: 0 0 8px; color: #e8e2ee; font-size: .86rem; font-weight: 700; }
+    .upload-status { color: #c9c6d7; font-size: .8rem; }
+    #clearPortrait[hidden] { display: none; }
+    details {
+      margin-top: 14px;
+      border: 1px solid #ffffff1a;
+      border-radius: 17px;
+      padding: 16px 18px;
+      background: #ffffff08;
+    }
+    summary { cursor: pointer; font-weight: 750; }
+    .storyboard {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .storyboard li {
+      border-left: 2px solid #ff91b7;
+      padding: 8px 10px;
+      color: #d8d4e3;
+      font-size: .83rem;
+      line-height: 1.5;
+    }
+    .storyboard strong { display: block; margin-bottom: 4px; color: #fff; }
+    .print-button { margin-top: 13px; }
+    .fine-print { margin: 14px 0 0; color: #aaa6b8; font-size: .76rem; line-height: 1.5; }
+
+    @keyframes rain { to { background-position: 0 48px; } }
+    @keyframes float { 0%, 100% { margin-bottom: 0; } 50% { margin-bottom: 7px; } }
+    @keyframes armSwing { from { transform: rotate(-13deg); } to { transform: rotate(13deg); } }
+    @keyframes legSwing { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+    @keyframes bodyWalk { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    @keyframes captionEnter { from { opacity: 0; translate: 22px 0; } to { opacity: 1; translate: 0 0; } }
+    @keyframes tear { 0% { transform: translateY(0); opacity: 0; } 18% { opacity: 1; } 100% { transform: translateY(23px); opacity: 0; } }
+    @keyframes heartbeat { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.18); } 23% { transform: scale(1); } 36% { transform: scale(1.12); } }
+    @keyframes flutter { 0%, 100% { transform: translate(0, 0) rotate(-8deg); } 50% { transform: translate(22px, -13px) rotate(10deg); } }
+
+    @media (max-width: 700px) {
+      .app { padding: 20px 15px 32px; }
+      .stage { min-height: 520px; }
+      .caption { top: 22px; left: 20px; max-width: 72%; }
+      .character { bottom: 13%; transform: translateX(-50%) scale(.88); transform-origin: bottom center; }
+      .stage.sunrise .character, .stage.healing .character { bottom: 14%; transform: translateX(-50%) translateY(var(--lift, 0px)) rotate(calc(3deg + var(--sway, 0deg))) scale(.88); }
+      .controls { grid-template-columns: 1fr; }
+      .button-row { justify-content: space-between; }
+      .progress-wrap { grid-row: 1; }
+      .extras { grid-template-columns: 1fr; }
+      .storyboard { grid-template-columns: 1fr; }
+      .storyboard li { padding: 4px 10px; }
+      .moon { width: 48px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .stage.walking .arm, .stage.walking .legs i, .stage.walking .body {
+        animation-duration: .62s !important;
+        animation-iteration-count: infinite !important;
+      }
+    }
+
+    @media print {
+      :root, body { color-scheme: light; color: #171321; background: white; }
+      body { min-width: 0; }
+      .app { width: 100%; padding: 0; }
+      header, .intro, .stage, .controls, .extras, .fine-print, .print-button { display: none !important; }
+      details { border: 0; padding: 0; background: white; }
+      details > summary { display: none; }
+      details > .storyboard { display: grid !important; grid-template-columns: 1fr 1fr; }
+      .storyboard li { color: #302b3a; break-inside: avoid; }
+      .storyboard strong { color: #171321; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand">Cerita pendek · animasi orisinal</div>
+      <div class="badge">5 adegan · bisa diputar ulang</div>
+    </header>
+
+    <h1>Patah Hati,<br>lalu Pulih.</h1>
+    <p class="intro">Sebuah perjalanan kecil dari malam yang berat menuju pagi yang baru. Putar adegannya, nikmati transisinya, dan pilih sendiri musik yang menemani.</p>
+
+    <section class="stage night" id="stage" aria-label="Panggung animasi kartun">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="moon" aria-hidden="true"></div>
+      <div class="hills" aria-hidden="true"></div>
+      <div class="ground" aria-hidden="true"></div>
+      <div class="puddle" aria-hidden="true"></div>
+      <div class="music-glow" aria-hidden="true"></div>
+      <div class="butterflies" aria-hidden="true">✦</div>
+      <div class="character" aria-label="Tokoh kartun yang sedang belajar pulih">
+        <img class="portrait" id="portrait" alt="Foto anime pilihan Anda">
+        <div class="hair"></div><div class="head"></div><div class="eye"></div><div class="tear"></div><div class="mouth"></div>
+        <div class="arm"></div><div class="arm right"></div><div class="body"></div><div class="heart">♥</div><div class="legs"><i></i><i></i></div>
+      </div>
+      <div class="caption" aria-live="polite">
+        <div class="scene-number" id="sceneNumber">Adegan 1 dari 5</div>
+        <h2 id="sceneTitle">Malam yang sunyi</h2>
+        <p id="sceneText">Di bawah langit yang muram, ia mencoba memahami perpisahan.</p>
+      </div>
+    </section>
+
+    <div class="controls" aria-label="Kontrol animasi">
+      <div class="button-row">
+        <button type="button" id="previous" aria-label="Adegan sebelumnya">← Sebelumnya</button>
+        <button type="button" class="primary" id="play" aria-label="Putar animasi">▶ Putar</button>
+        <button type="button" id="next" aria-label="Adegan berikutnya">Berikutnya →</button>
+      </div>
+      <div class="progress-wrap">
+        <span id="progressLabel">1 / 5</span>
+        <progress id="progress" value="1" max="5" aria-label="Kemajuan adegan"></progress>
+      </div>
+      <button type="button" id="restart">↺ Ulangi</button>
+    </div>
+
+    <section class="extras" aria-label="Musik dan catatan">
+      <div class="card">
+        <h3>🎵 Gerak mengikuti musik</h3>
+        <p>Saat lagu diputar, lima adegan berganti otomatis sepanjang durasinya dan karakter bergerak melintasi panggung mengikuti alur cerita serta hentakan musik.</p>
+        <div class="audio-actions">
+          <label class="file-label">Pilih file audio
+            <input type="file" id="audioFile" accept="audio/*">
+          </label>
+          <span id="audioStatus" role="status">Belum ada musik dipilih.</span>
+          <audio id="audioPlayer" controls hidden></audio>
+        </div>
+        <div class="upload-divider"></div>
+        <p class="upload-heading">🖼️ Ganti karakter dengan foto anime</p>
+        <div class="audio-actions">
+          <label class="file-label">Pilih foto
+            <input type="file" id="portraitFile" accept="image/*">
+          </label>
+          <button type="button" id="clearPortrait" hidden>Hapus foto</button>
+          <span class="upload-status" id="portraitStatus" role="status">Belum ada foto dipilih.</span>
+        </div>
+        <p class="audio-note" style="margin-top:8px">Pilih JPG, PNG, atau WebP. Foto hanya digunakan di halaman ini dan tidak diunggah.</p>
+      </div>
+      <div class="card">
+        <h3>💌 Pesan cerita</h3>
+        <p>Yang pergi boleh dikenang, tapi diri sendiri tetap layak diperjuangkan. Pelan-pelan, hati akan menemukan terang lagi.</p>
+      </div>
+    </section>
+
+    <details>
+      <summary>Lihat storyboard &amp; naskah adegan</summary>
+      <ol class="storyboard">
+        <li><strong>1 · Malam yang sunyi</strong>Tokoh duduk sendiri. Hujan dan langit gelap menggambarkan hati yang sedang berduka.</li>
+        <li><strong>2 · Kenangan datang</strong>Ia mengingat hal-hal manis. Kilau kecil muncul di tengah rintik hujan.</li>
+        <li><strong>3 · Berani melepas</strong>Ia menghela napas dan membiarkan kenangan berlalu seperti daun terbawa angin.</li>
+        <li><strong>4 · Pagi yang baru</strong>Langit berubah hangat. Tokoh berdiri dan mulai melangkah maju.</li>
+        <li><strong>5 · Hati yang tumbuh</strong>Cahaya, kupu-kupu, dan senyum kecil menandai awal yang baru.</li>
+      </ol>
+      <button type="button" class="print-button" onclick="window.print()">Cetak / simpan storyboard sebagai PDF</button>
+    </details>
+    <p class="fine-print">Animasi, karakter, dan narasi pada halaman ini dibuat orisinal. Lagu “Kelingan Mantan” tidak disertakan; pilih file audio milik Anda sendiri untuk memutarnya.</p>
+  </main>
+
+  <script>
+    const scenes = [
+      { title: "Malam yang sunyi", text: "Di bawah langit yang muram, ia mencoba memahami perpisahan.", mood: "night rain", position: "24%" },
+      { title: "Kenangan datang", text: "Kenangan manis singgah sebentar, lalu pergi bersama rintik hujan.", mood: "night rain", position: "38%" },
+      { title: "Berani melepas", text: "Ia menarik napas dalam-dalam. Tidak semua yang dicintai harus digenggam.", mood: "dawn", position: "52%" },
+      { title: "Pagi yang baru", text: "Sedikit demi sedikit, langkahnya terasa lebih ringan.", mood: "sunrise", position: "66%" },
+      { title: "Hati yang tumbuh", text: "Ia tersenyum. Cerita baru dimulai saat ia memilih dirinya sendiri.", mood: "healing", position: "78%" }
+    ];
+
+    const stage = document.getElementById("stage");
+    const title = document.getElementById("sceneTitle");
+    const text = document.getElementById("sceneText");
+    const sceneNumber = document.getElementById("sceneNumber");
+    const progress = document.getElementById("progress");
+    const progressLabel = document.getElementById("progressLabel");
+    const playButton = document.getElementById("play");
+    const audioFile = document.getElementById("audioFile");
+    const audioPlayer = document.getElementById("audioPlayer");
+    const audioStatus = document.getElementById("audioStatus");
+    const character = document.querySelector(".character");
+    const portrait = document.getElementById("portrait");
+    const portraitFile = document.getElementById("portraitFile");
+    const portraitStatus = document.getElementById("portraitStatus");
+    const clearPortraitButton = document.getElementById("clearPortrait");
+    let currentScene = 0;
+    let timer = null;
+    let audioObjectUrl = null;
+    let portraitObjectUrl = null;
+    let audioContext = null;
+    let analyser = null;
+    let frequencyData = null;
+    let animationFrame = null;
+    let smoothedEnergy = 0;
+    let lastBeat = 0;
+    let sceneChangeTimeout = null;
+
+    function showScene(index) {
+      const previousScene = currentScene;
+      currentScene = (index + scenes.length) % scenes.length;
+      const scene = scenes[currentScene];
+      const isMoving = timer !== null || Boolean(audioPlayer.src && !audioPlayer.paused);
+      stage.className = `stage ${scene.mood} scene-${currentScene + 1}${isMoving ? " walking" : ""}${portraitObjectUrl ? " has-portrait" : ""}`;
+      character.classList.toggle("walking", isMoving);
+      if (!audioPlayer.src || !Number.isFinite(audioPlayer.duration)) character.style.left = scene.position;
+      if (previousScene !== currentScene) {
+        if (sceneChangeTimeout !== null) window.clearTimeout(sceneChangeTimeout);
+        stage.offsetWidth;
+        stage.classList.add("scene-change");
+        sceneChangeTimeout = window.setTimeout(() => {
+          stage.classList.remove("scene-change");
+          sceneChangeTimeout = null;
+        }, 800);
+      }
+      title.textContent = scene.title;
+      text.textContent = scene.text;
+      sceneNumber.textContent = `Adegan ${currentScene + 1} dari ${scenes.length}`;
+      if (!audioPlayer.duration || !Number.isFinite(audioPlayer.duration)) {
+        progress.value = currentScene + 1;
+        progressLabel.textContent = `${currentScene + 1} / ${scenes.length}`;
+      }
+    }
+
+    function setPlayButton(isPlaying, hasAudio = Boolean(audioPlayer.src)) {
+      playButton.textContent = isPlaying ? "Ⅱ Jeda" : (hasAudio ? "▶ Putar lagu" : "▶ Putar");
+      playButton.setAttribute("aria-label", isPlaying ? "Jeda animasi" : (hasAudio ? "Putar lagu dan animasi" : "Putar animasi"));
+    }
+
+    function setWalking(isWalking) {
+      stage.classList.toggle("walking", isWalking);
+      character.classList.toggle("walking", isWalking);
+    }
+
+    function stopTimer() {
+      if (timer !== null) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+      setPlayButton(false);
+      setWalking(false);
+    }
+
+    function stopAudioMotion() {
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+      stage.style.setProperty("--audio-level", "0");
+      character.style.setProperty("--lift", "0px");
+      character.style.setProperty("--sway", "0deg");
+      character.style.removeProperty("--float-speed");
+      stage.style.setProperty("--flutter-speed", "2s");
+      stage.style.setProperty("--rain-speed", ".45s");
+      stage.style.setProperty("--ripple", "1");
+      stage.style.setProperty("--scenery-drift", "0px");
+    }
+
+    function animateToAudio() {
+      if (audioPlayer.paused || audioPlayer.ended) {
+        animationFrame = null;
+        return;
+      }
+      let bass = 0;
+      let energy = 0;
+      if (analyser && frequencyData) {
+        analyser.getByteFrequencyData(frequencyData);
+        const bassBins = Math.max(1, Math.floor(frequencyData.length * 0.12));
+        for (let i = 0; i < frequencyData.length; i++) {
+          energy += frequencyData[i];
+          if (i < bassBins) bass = Math.max(bass, frequencyData[i] / 255);
+        }
+        energy /= frequencyData.length * 255;
+        smoothedEnergy += (energy - smoothedEnergy) * 0.16;
+      } else {
+        smoothedEnergy = .12 + (Math.sin(audioPlayer.currentTime * 9) + 1) * .08;
+      }
+      const beat = Math.max(0, bass - lastBeat * 0.82);
+      lastBeat = bass;
+      const motion = analyser
+        ? Math.min(1, Math.max(smoothedEnergy * 2.5, bass * 0.55) + beat * 1.1)
+        : smoothedEnergy;
+      stage.style.setProperty("--audio-level", motion.toFixed(2));
+      stage.style.setProperty("--flutter-speed", `${(1.7 - motion * 0.65).toFixed(2)}s`);
+      stage.style.setProperty("--rain-speed", `${(0.56 - motion * 0.12).toFixed(2)}s`);
+      stage.style.setProperty("--ripple", (1 + motion * 0.1).toFixed(2));
+      stage.style.setProperty("--scenery-drift", `${((bass - 0.28) * 5).toFixed(1)}px`);
+      if (Number.isFinite(audioPlayer.duration) && audioPlayer.duration > 0) {
+        const songProgress = Math.min(1, Math.max(0, audioPlayer.currentTime / audioPlayer.duration));
+        const walkCycle = (audioPlayer.currentTime % 32) / 32;
+        const walkPosition = 18 + 64 * (1 - Math.abs(walkCycle * 2 - 1));
+        character.style.left = `${walkPosition}%`;
+        const activeScene = Math.min(scenes.length - 1, Math.floor(songProgress * scenes.length));
+        if (activeScene !== currentScene) showScene(activeScene);
+      }
+      animationFrame = window.requestAnimationFrame(animateToAudio);
+    }
+
+    async function startAudioMotion() {
+      if (!audioPlayer.src) return;
+      if (animationFrame === null) animationFrame = window.requestAnimationFrame(animateToAudio);
+      try {
+        const AudioContextType = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextType) return;
+        if (!audioContext) {
+          audioContext = new AudioContextType();
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 256;
+          const source = audioContext.createMediaElementSource(audioPlayer);
+          source.connect(analyser);
+          analyser.connect(audioContext.destination);
+          frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        }
+        await audioContext.resume();
+      } catch (error) {
+        audioStatus.textContent = `Mode visual audio tidak tersedia; gerakan dan slide tetap berjalan. (${error.message})`;
+      }
+    }
+
+    async function toggleAnimation() {
+      if (audioPlayer.src) {
+        if (audioPlayer.paused) {
+          try {
+            await audioPlayer.play();
+          } catch (error) {
+            audioStatus.textContent = `Lagu tidak dapat diputar: ${error.message}`;
+          }
+        } else {
+          audioPlayer.pause();
+        }
+        return;
+      }
+      if (timer !== null) {
+        stopTimer();
+        return;
+      }
+      setPlayButton(true, false);
+      setWalking(true);
+      timer = window.setInterval(() => {
+        if (currentScene === scenes.length - 1) {
+          stopTimer();
+          return;
+        }
+        showScene(currentScene + 1);
+      }, 4200);
+    }
+
+    document.getElementById("previous").addEventListener("click", () => {
+      if (audioPlayer.src && Number.isFinite(audioPlayer.duration)) {
+        audioPlayer.currentTime = Math.max(0, (currentScene - 1) * audioPlayer.duration / scenes.length);
+      } else {
+        stopTimer();
+        showScene(currentScene - 1);
+      }
+    });
+    document.getElementById("next").addEventListener("click", () => {
+      if (audioPlayer.src && Number.isFinite(audioPlayer.duration)) {
+        audioPlayer.currentTime = Math.min(audioPlayer.duration, (currentScene + 1) * audioPlayer.duration / scenes.length);
+      } else {
+        stopTimer();
+        showScene(currentScene + 1);
+      }
+    });
+    document.getElementById("restart").addEventListener("click", () => {
+      if (audioPlayer.src) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+      } else {
+        stopTimer();
+        showScene(0);
+      }
+    });
+    playButton.addEventListener("click", toggleAnimation);
+
+    audioFile.addEventListener("change", () => {
+      const file = audioFile.files && audioFile.files[0];
+      if (!file) return;
+      audioPlayer.pause();
+      if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
+      audioObjectUrl = URL.createObjectURL(file);
+      audioPlayer.src = audioObjectUrl;
+      audioPlayer.hidden = false;
+      audioStatus.textContent = `${file.name} — gunakan tombol Putar lagu untuk mulai.`;
+      stopTimer();
+      showScene(0);
+    });
+
+    audioPlayer.addEventListener("play", () => {
+      setPlayButton(true);
+      setWalking(true);
+      startAudioMotion();
+    });
+    audioPlayer.addEventListener("pause", () => {
+      stopAudioMotion();
+      setPlayButton(false);
+      setWalking(false);
+    });
+    audioPlayer.addEventListener("timeupdate", () => {
+      if (!Number.isFinite(audioPlayer.duration) || audioPlayer.duration <= 0) return;
+      const sceneIndex = Math.min(scenes.length - 1, Math.floor(audioPlayer.currentTime / audioPlayer.duration * scenes.length));
+      if (sceneIndex !== currentScene) showScene(sceneIndex);
+      progress.value = audioPlayer.currentTime / audioPlayer.duration * scenes.length;
+      const elapsed = Math.floor(audioPlayer.currentTime);
+      const total = Math.floor(audioPlayer.duration);
+      const formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+      progressLabel.textContent = `${sceneIndex + 1} / ${scenes.length} · ${formatTime(elapsed)} / ${formatTime(total)}`;
+    });
+    audioPlayer.addEventListener("ended", () => {
+      stopAudioMotion();
+      setPlayButton(false);
+      setWalking(false);
+    });
+    audioPlayer.addEventListener("error", () => {
+      audioStatus.textContent = "File audio tidak dapat diputar. Coba format audio lain.";
+      stopAudioMotion();
+      setPlayButton(false);
+      setWalking(false);
+    });
+
+    portraitFile.addEventListener("change", () => {
+      const file = portraitFile.files && portraitFile.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        portraitStatus.textContent = "Pilih file gambar seperti JPG, PNG, atau WebP.";
+        portraitFile.value = "";
+        return;
+      }
+      if (portraitObjectUrl) URL.revokeObjectURL(portraitObjectUrl);
+      portraitObjectUrl = URL.createObjectURL(file);
+      portrait.src = portraitObjectUrl;
+      clearPortraitButton.hidden = false;
+      portraitStatus.textContent = file.name;
+      stage.classList.add("has-portrait");
+    });
+    clearPortraitButton.addEventListener("click", () => {
+      if (portraitObjectUrl) URL.revokeObjectURL(portraitObjectUrl);
+      portraitObjectUrl = null;
+      portrait.removeAttribute("src");
+      portraitFile.value = "";
+      clearPortraitButton.hidden = true;
+      portraitStatus.textContent = "Foto anime dihapus; karakter kartun kembali.";
+      stage.classList.remove("has-portrait");
+    });
+
+    window.addEventListener("pagehide", () => {
+      stopTimer();
+      stopAudioMotion();
+      if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
+      if (portraitObjectUrl) URL.revokeObjectURL(portraitObjectUrl);
+    });
+
+    showScene(0);
+  </script>
+</body>
+</html>
